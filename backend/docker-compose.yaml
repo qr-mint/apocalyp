@@ -1,0 +1,49 @@
+services:
+  game-core:
+    build: ${GAME_CORE_PATH}
+    hostname: ${GAME_CORE_NAME}
+    container_name: ${GAME_CORE_NAME}
+    restart: "always"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+    expose:
+        - ${GAME_CORE_PORT}
+    volumes:
+      - ${GAME_CORE_PATH}:/core/public
+    networks:
+       - qrmint
+    labels:
+       - "traefik.docker.network=qrmint-proxy"
+       - "traefik.enable=true"
+       - "traefik.http.routers.${GAME_CORE_NAME}.rule=Host(`$GAME_CORE_HOSTNAME`)"
+       - "traefik.http.routers.${GAME_CORE_NAME}.tls.certresolver=default"
+  game-socket:
+    build:
+      context: .
+      dockerfile: ./socket.dockerfile
+    hostname: ${SOCKET_NAME}
+    container_name: ${SOCKET_NAME}
+    restart: "always"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+    expose:
+        - ${SOCKET_PORT}
+    networks:
+       - qrmint
+    labels:
+       - "traefik.docker.network=qrmint-proxy"
+       - "traefik.enable=true"
+       - "traefik.http.routers.${SOCKET_NAME}.entrypoints=websecure"
+      # - "traefik.http.routers.qrmint-socket.entrypoints=wss"
+       - "traefik.http.routers.${SOCKET_NAME}.rule=Host(`$SOCKET_HOST`)"
+       - "traefik.http.routers.${SOCKET_NAME}.tls.certresolver=default"
+networks:
+  qrmint:
+    driver: bridge
+    name: qrmint-proxy

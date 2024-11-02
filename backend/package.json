@@ -1,0 +1,45 @@
+{
+  "name": "Apocalypton",
+  "version": "1.0.0",
+  "description": "Game",
+  "main": "index.html",
+  "scripts": {
+    "dev": "ts-node index.js",
+    "start": "ts-node index.js",
+    "start:socket": "ts-node ./socket_server.js"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.25.4",
+    "@types/express": "^4.17.13",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-json": "^3.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.3.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.4",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.19.1",
+    "@ton/ton": "^15.0.0",
+    "axios": "^1.7.7",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "expose-loader": "^5.0.0",
+    "express-rate-limit": "^7.4.0",
+    "grammy": "^1.30.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "prisma": "^5.19.1",
+    "socket.io": "^4.8.0",
+    "socket.io-client": "^4.8.0",
+    "uuid": "^10.0.0"
+  }
+}

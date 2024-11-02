@@ -1,0 +1,27 @@
+services:
+  game-front:
+    build: ${GAME_PATH}
+    hostname: ${GAME_NAME}
+    container_name: ${GAME_NAME}
+    restart: "always"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+    volumes:
+      - ${GAME_PATH}/nginx/logs:/var/log/nginx
+    expose:
+      - ${GAME_PORT}
+    networks:
+      - qrmint
+    labels:
+      - "traefik.docker.network=qrmint-proxy"
+      - "traefik.enable=true"
+      - "traefik.http.routers.${GAME_NAME}.rule=Host(`$GAME_HOSTNAME`)"
+      - "traefik.http.routers.${GAME_NAME}.entrypoints=web,websecure"
+      - "traefik.http.routers.${GAME_NAME}.tls.certresolver=default"
+networks:
+  qrmint:
+    driver: bridge
+    name: qrmint-proxy

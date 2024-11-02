@@ -1,0 +1,6 @@
+backend/node_modules
+game/node_modules
+backend/.env
+game/.env
+game/dist
+.DS_Store

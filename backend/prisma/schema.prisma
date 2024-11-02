@@ -1,0 +1,105 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id          Int     @id @default(autoincrement())
+  telegram_id String  @unique
+  username    String
+  address     String?
+  referralCode String?
+  referrals    referrals[] @relation("ReferralsMade")
+  referredById Int?
+}
+
+model referrals {
+  id          Int      @id @default(autoincrement())
+  invitedBy   users    @relation("ReferralsMade", fields: [invitedById], references: [id])
+  invitedById Int
+  invitedId   Int
+  createdAt   DateTime @default(now())
+
+  @@unique([invitedId, invitedById])
+}
+
+model game_data {
+  id                    Int          @id @default(autoincrement())
+  user_id               Int
+  lives                 Int          @default(10)
+  power_up_count        Json
+  unlocked_badge_data   Json
+  unlocked_monster_data Json
+  curr_level_status     Json?
+  attempt_timer         BigInt?
+  coins                 Int          @default(0)
+  level_data            level_data[]
+  created_at            DateTime     @default(now())
+  updated_at            DateTime     @default(now()) @updatedAt
+}
+
+model level_data {
+  id            Int        @id @default(autoincrement())
+  number        Int        @default(0)
+  stars         Int        @default(0)
+  score         Int        @default(0)
+  level_cleared Boolean    @default(false)
+  total_score   Int        @default(0)
+  user_id       Int
+  game_data_id  Int
+  game_data     game_data? @relation(references: [id], fields: [game_data_id])
+
+  @@unique([number, game_data_id])
+}
+
+enum payments {
+  stars
+  arcpay
+  aeon
+}
+
+enum order_status {
+  created
+  cancelled
+  error
+  confirmed
+}
+
+model orders {
+  id               Int          @id @default(autoincrement())
+  order_no         String
+  created_at       DateTime     @default(now())
+  payment          payments
+  amount           String
+  currency         String
+  token            String
+  item             Json
+  payment_order_id String
+  user_id          Int
+  status           order_status
+}
+
+model apps {
+  id               Int          @id @default(autoincrement())
+  name             String
+  key              String       @unique
+  created_at       DateTime?
+  email            String?
+  payments         app_payments[]
+}
+
+model app_payments {
+  id               Int          @id @default(autoincrement())
+  created_at       DateTime?
+  payment          payments
+  keys             Json
+  app_id           Int
+  app              apps        @relation(references: [id], fields: [app_id])
+
+  @@unique([keys])
+}
