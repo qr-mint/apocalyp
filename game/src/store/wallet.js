@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { connect } from '../api/wallet';
+import { connect } from '../sdk/api/wallet';
 import { VERSION } from './config';
 
 const initialState = {

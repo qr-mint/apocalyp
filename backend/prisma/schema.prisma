@@ -8,21 +8,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
-  id          Int     @id @default(autoincrement())
-  telegram_id String  @unique
-  username    String
-  address     String?
-  referralCode String?
-  referrals    referrals[] @relation("ReferralsMade")
-  referredById Int?
+model invite_codes {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  code        String
+  created_at  DateTime @default(now())
 }
 
 model referrals {
   id          Int      @id @default(autoincrement())
-  invitedBy   users    @relation("ReferralsMade", fields: [invitedById], references: [id])
   invitedById Int
-  invitedId   Int
+  invitedId   Int      @unique
   createdAt   DateTime @default(now())
 
   @@unique([invitedId, invitedById])
@@ -55,51 +51,4 @@ model level_data {
   game_data     game_data? @relation(references: [id], fields: [game_data_id])
 
   @@unique([number, game_data_id])
-}
-
-enum payments {
-  stars
-  arcpay
-  aeon
-}
-
-enum order_status {
-  created
-  cancelled
-  error
-  confirmed
-}
-
-model orders {
-  id               Int          @id @default(autoincrement())
-  order_no         String
-  created_at       DateTime     @default(now())
-  payment          payments
-  amount           String
-  currency         String
-  token            String
-  item             Json
-  payment_order_id String
-  user_id          Int
-  status           order_status
-}
-
-model apps {
-  id               Int          @id @default(autoincrement())
-  name             String
-  key              String       @unique
-  created_at       DateTime?
-  email            String?
-  payments         app_payments[]
-}
-
-model app_payments {
-  id               Int          @id @default(autoincrement())
-  created_at       DateTime?
-  payment          payments
-  keys             Json
-  app_id           Int
-  app              apps        @relation(references: [id], fields: [app_id])
-
-  @@unique([keys])
 }

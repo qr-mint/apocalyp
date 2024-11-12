@@ -3,14 +3,14 @@ import { useTonConnectModal, useTonWallet } from "@tonconnect/ui-react";
 import { toast } from 'react-toastify';
 
 import Portal from "../Portal";
-import { create, confirm } from "../../api/payments";
+import { create, confirm } from "../../sdk/api/payments";
 import { Error } from "../Error";
 import { Waiting } from "./Waiting";
 import { SelectPaymentSystem } from "./SelectPaymentSystem";
 import * as styles from "./style.module.scss";
 import { methodPayments } from "./constants";
 import { SelectItems } from "./SelectItems";
-import { walletBalance } from "../../api/wallet";
+import { walletBalance } from "../../sdk/api/wallet";
 import { Window } from "../Payments/Window"
 
 const paymentStatuses = {
@@ -54,7 +54,7 @@ const Dialog = ({ isDev, tonConnectUI, onClose }) => {
     try {
       const currencyToken = paymentMethod === methodPayments.arcpay ? 'ton' : paymentMethod === methodPayments.stars ? 'stars' : 'usdt';
       const amount = paymentMethod === methodPayments.arcpay ? ton : paymentMethod === methodPayments.stars ? stars : usd;
-      const data = await create({ coins, amount, payment: paymentMethod, currencyToken });
+      const data = await create({ name: `${coins} coins`,coins, amount, payment: paymentMethod, currencyToken });
       if (paymentMethod === methodPayments.arcpay) {
         const tonConnectResponse = await tonConnectUI.sendTransaction({
           messages: data.transactions.map((tx) => {

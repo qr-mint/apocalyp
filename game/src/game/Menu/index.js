@@ -1,7 +1,11 @@
 import { CWScroller } from "../../utils/scroll";
-import { badgesRewards, levelData as configLevelData } from "../../config/config";
+import { levelData as configLevelData } from "../../config/config";
 import { getStatic } from "../../api/static";
+import { getPaymentStatic } from "../../sdk/api/payments";
 import { useGameStore } from "../../store/game";
+import { inviteCode } from "../../api/partner";
+import { toast } from "react-toastify";
+import { copyToClipboard } from '../../utils/copyToClipboard';
 
 const achievements = [
   {
@@ -41,7 +45,7 @@ export class Menu {
       "Play 35 levels to unlock",
       "Play 45 levels to unlock"
     ];
-    this.badgesRewards = badgesRewards;
+
     this.unlocableSoundId = [0, 2, 4, 3, 5, 1];
     this.CWScroller = new CWScroller(configObj);
   }
@@ -50,10 +54,10 @@ export class Menu {
     try {
       const data = await getStatic();
       this.userCount = data.users;
-      this.orders = data.orders;
       this.referrals = data.referrals;
       this.level3Stars = data.levels;
       this.socialSubscribed = data.socialSubscribed;
+      this.orders = await getPaymentStatic();
     } catch (err) {
       this.configObj.appState.setError(err.message);
     }
@@ -186,7 +190,7 @@ export class Menu {
     try {
       let totalElapsedTime = await this.configObj.attempTimerObj.updateTime();
       if (totalElapsedTime != null) {
-        let totalLifeToUpdate = Math.floor(totalElapsedTime.m / this.configObj.attempTimeCounter);
+        const totalLifeToUpdate = Math.floor(totalElapsedTime.h / this.configObj.attempTimeCounter);
         await this.configObj.incrementLife(totalLifeToUpdate);
       }
     } catch (err) {
@@ -220,7 +224,7 @@ export class Menu {
           this.game.add.button(
             startXpos, startYPos,
             "spriteAtlas",
-            this.achievementClick.bind(this, this.configObj.languageData["unlockedBadgeData"].subHeading, "badge_" + (achievement.index), popUpContainer, this.configObj.languageData["unlockedBadgeData"].unlockBadgeText, index, this.badgesRewards[index]),
+            this.achievementClick.bind(this, this.configObj.languageData["unlockedBadgeData"].subHeading, "badge_" + (achievement.index), popUpContainer, this.configObj.languageData["unlockedBadgeData"].unlockBadgeText, index),
             this));
         this.badgesArr[this.badgesArr.length - 1].frameName = "badge_" + (achievement.index) + ".png";
         popUpContainer.add(this.badgesArr[index]);
@@ -254,7 +258,7 @@ export class Menu {
     }
   }
 
-  achievementClick(heading, img, container, textContainer, number, rewards) {
+  achievementClick(heading, img, container, textContainer, number) {
     if (!this.infoPopUp && !this.timerPopUp) {
       this.tint_Bg1 = this.game.add.sprite(this.configObj.percentOfWidth(0), 0, "tint_background");
       this.close_click.inputEnabled = false;
@@ -273,19 +277,7 @@ export class Menu {
       let achievement_txt = this.game.add.text(this.configObj.percentOfWidth(0.5), 450, "" + textContainer[number], { font: "28px londrina", fill: "#a06626", align: "center" });
       achievement_txt.anchor.setTo(0.5, 0.5);
       popUpContainer.add(achievement_txt);
-      this.rewards_txt = this.game.add.text(this.configObj.percentOfWidth(0.25), 520, this.configObj.languageData["unlockedBadgeData"].rewards + ": ", { font: "30px londrina", fill: "#a06626", align: "center" });
-      popUpContainer.add(this.rewards_txt);
-      let startX = this.configObj.percentOfWidth(0.45);
-      let startY = 520;
-      for (let i = 0; i < rewards.length; i++) {
-        let rtext = this.game.add.text(startX, startY, `${rewards[i].count}`, { font: "30px londrina", fill: "#a06626", align: "center" });
 
-        popUpContainer.add(rtext);
-        let rImg = this.game.add.sprite(startX + 70, startY + 20, "spriteAtlas", "" + rewards[i].powerUp + ".png");
-        rImg.anchor.setTo(0.5, 0.5);
-        popUpContainer.add(rImg);
-        startY += 65;
-      }
       this.close_click1 = null;
       this.close_click1 = this.game.add.button(this.configObj.percentOfWidth(0.74), 130, "spriteAtlas", this.closeInfoPopUp.bind(this, popUpContainer), this);
       this.close_click1.frameName = "close_btn.png";
@@ -297,7 +289,6 @@ export class Menu {
   }
 
   unlockableClick(heading, img, container, textContainer, number) {
-
     if (!this.infoPopUp) {
       this.tint_Bg1 = this.game.add.sprite(this.configObj.percentOfWidth(0), 0, "tint_background");
       this.close_click.inputEnabled = false;
@@ -406,8 +397,14 @@ export class Menu {
     this.CWScroller.Enable(true);
   }
 
-  OnCopyClipboard() {
-
+  async OnCopyClipboard() {
+    try {
+      const code = await inviteCode();
+      await  copyToClipboard(`https://t.me/apocalypton_bot/apocalyp?startapp=${code}`);
+      toast("Copy to link");
+    } catch (err) {
+      this.configObj.appState.setError(err.message);
+    }
   }
 
   OnShopClick() {
@@ -615,12 +612,11 @@ export class Menu {
           startX = this.configObj.percentOfWidth(0.18);
           startY += 200;
         }
-        console.log(this.configObj.languageData["unlockedData"].subHeading1, this.configObj.languageData["unlockedData"].subHeading2);
         if (this.configObj.unlockedMonsterArr.indexOf("char_" + (i + 1)) == -1) {
-          this.unlockMonsterArr[i] = this.game.add.button(startX, startY, "spriteAtlas1", this.unlockableClick.bind(this, this.configObj.languageData["unlockedData"].subHeading2, "char_" + (i + 1), popUpContainer, this.configObj.languageData["unlockedData"].unlockPetText, i), this);
+          this.unlockMonsterArr[i] = this.game.add.button(startX, startY, "spriteAtlas1", this.unlockableClick.bind(this, this.configObj.languageData["unlockedData"].subHeading2, "char_" + (i + 1), popUpContainer, this.configObj.languageData["unlockedData"].unlockText, i), this);
           this.unlockMonsterArr[i].frameName = "char_" + (i + 1) + ".png";
         } else {
-          this.unlockMonsterArr[i] = this.game.add.button(startX, startY, "spriteAtlas1", this.unlockableClick.bind(this, this.configObj.languageData["unlockedData"].subHeading1, "char_unlocked" + (i + 1), popUpContainer, this.configObj.languageData["unlockedData"].unlockPetText, i), this);
+          this.unlockMonsterArr[i] = this.game.add.button(startX, startY, "spriteAtlas1", this.unlockableClick.bind(this, this.configObj.languageData["unlockedData"].subHeading1, "char_unlocked" + (i + 1), popUpContainer, this.configObj.languageData["unlockedData"].unlockText, i), this);
           this.unlockMonsterArr[i].frameName = "char_unlocked" + (i + 1) + ".png";
         }
 
@@ -768,8 +764,8 @@ export class Menu {
     const popUpContainer = this.game.add.group();
     const bg = this.game.add.sprite(this.configObj.percentOfWidth(0.07), 200, "buy_popup");
     popUpContainer.add(bg);
-    const buyBtn = this.game.add.button(this.configObj.percentOfWidth(0.318), 520, "spriteAtlas1", this.OnCopyClipboard, this);
-    buyBtn.frameName = "buy_attempts_btn.png";
+    const buyBtn = this.game.add.button(this.configObj.percentOfWidth(0.39), 520, "spriteAtlas1", this.OnCopyClipboard, this);
+    buyBtn.frameName = "invite.png";
     popUpContainer.add(buyBtn);
     popUpContainer.add(this.game.add.text(this.configObj.percentOfWidth(0.255), 280, this.configObj.languageData["warning"]["noUsers"].heading, { font: "45px londrina", fill: "red", align: "center" }));
     popUpContainer.add(this.game.add.text(this.configObj.percentOfWidth(0.2), 350, `Need to get ${users} users \n`, { font: "40px londrina", fill: "#a06626", align: "center" }));
@@ -791,30 +787,36 @@ export class Menu {
         this.timerText.visible = false;
       }
       if (this.lifeCount == 0) {
-        const timer = (this.configObj.attempTimeCounter * 60) - ((this.totalElapsedTime.m * 60) + this.totalElapsedTime.s);
-        const minutes = Math.floor(timer / 60);
-        const min = minutes < 10 ? "0" + minutes : minutes;
-        const sec = timer % 60;
-        const seconds = sec < 10 ? "0" + sec : sec;
-        if (minutes >= 0 && sec >= 0) {
-          if (this.timerText)
-            this.timerText.text = min + ":" + seconds;
+        // Changed to 24 hours (24 * 60 * 60 seconds)
+        const timer = (6 * 60 * 60) - ((this.totalElapsedTime.m * 60) + this.totalElapsedTime.s);
+        const hours = Math.floor(timer / 3600);
+        const minutes = Math.floor((timer % 3600) / 60);
+        const seconds = timer % 60;
+        
+        const hrs = hours < 10 ? "0" + hours : hours;
+        const mins = minutes < 10 ? "0" + minutes : minutes;
+
+        if (hours >= 0 && minutes >= 0 && seconds >= 0) {
+          const timeDisplay = `${hrs}:${mins}`;
+          if (this.timerText) {
+            this.timerText.text = timeDisplay;
+          }
           if (this.timerPopUp) {
-            this.remainingTime.text = min + ":" + seconds;
+            this.remainingTime.text = timeDisplay;
           }
         }
       }
-      if (this.totalElapsedTime.m > 0 && this.totalElapsedTime.m % this.configObj.attempTimeCounter == 0) {
+      if (this.totalElapsedTime.h > 0 && this.totalElapsedTime.h % this.configObj.attempTimeCounter == 0) {
         //this.configObj.attempTimeCounter += this.configObj.attempTimeCounter;
         try {
           await this.configObj.incrementLife(1);
-          this.lifeText.text = "" + await this.configObj.getLifeCount();
+          this.lifeText.text = this.configObj.getLifeCount().toSting();
         } catch (err) {
           this.configObj.appState.setError(err.message);
         }
       }
     } else {
-      this.configObj.attempTimeCounter = 10;
+      this.configObj.attempTimeCounter = 6;
       this.game.time.events.remove(this.loopEvent);
     }
   }

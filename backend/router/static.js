@@ -18,21 +18,12 @@ const checkMemberInChannle = async (username, chatId) => {
 router
   .get('/all', async (req, res) => {
     try {
-      const users = await prisma.users.count();
-      const orders = (await prisma.orders.groupBy({
-        by: ["currency"],
-        where: { user_id: req.user.id, status: "confirmed" },
-        _count: {
-          id: true,
-        }
-      })).map((order) => ({
-        [order.currency]: order._count.id
-      }));
+      const users = await prisma.game_data.count();
       const referrals = await prisma.referrals.count({
-        where: { invitedId: req.user.id }
+        where: { invitedById: req.user.user_id }
       });
       const levels = await prisma.level_data.count({
-        where: { stars: 3, user_id: req.user.id }
+        where: { stars: 3, user_id: req.user.user_id }
       });
 
       const tgGroup = await checkMemberInChannle("QrMint_Bot", req.user.telegramId);
@@ -42,7 +33,7 @@ router
 
       const socialSubscribed = tgGroup && (enChannel || ruChannel);
 
-      return res.json(new Response().data({ users, orders, referrals, levels, socialSubscribed }));
+      return res.json(new Response().data({ users, referrals, levels, socialSubscribed }));
     } catch (err) {
       return res.status(400).json(new Response().error(err.message));
     }

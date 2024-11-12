@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  gap: 20px;
+  color: white;
+
+  p {
+    font-weight: 500;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  img {
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+  }
+  
+  .telegram {
+    position: relative;
+    text-align: center;
+
+    span {
+      cursor: pointer !important;
+      font-weight: 500;
+      font-weight: 16px;
+    }
+  }
+}

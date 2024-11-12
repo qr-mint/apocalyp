@@ -89,7 +89,7 @@ export class LevelUp {
     async checkForLifeUpdate() {
         const totalElapsedTime = await this.configObj.attempTimerObj.updateTime();
         if (totalElapsedTime != null) {
-            const totalLifeToUpdate = Math.floor(totalElapsedTime.m / this.configObj.attempTimeCounter);
+            const totalLifeToUpdate = Math.floor(totalElapsedTime.h / this.configObj.attempTimeCounter);
             try {
                 await this.configObj.incrementLife(totalLifeToUpdate);
             } catch (err) {
@@ -102,7 +102,7 @@ export class LevelUp {
         this.lifeCount = this.configObj.getLifeCount();
         if (this.lifeCount < 3) {
             this.totalElapsedTime = await this.configObj.attempTimerObj.updateTime();
-            if (this.totalElapsedTime.m > 0 && this.totalElapsedTime.m % this.configObj.attempTimeCounter == 0) {
+            if (this.totalElapsedTime.h > 0 && this.totalElapsedTime.h % this.configObj.attempTimeCounter == 0) {
                 this.configObj.attempTimeCounter += this.configObj.attempTimeCounter;
                 try {
                     await this.configObj.incrementLife(1);
@@ -114,7 +114,7 @@ export class LevelUp {
                 }
             }
         } else {
-            this.configObj.attempTimeCounter = 2;
+            this.configObj.attempTimeCounter = 6;
             this.game.time.events.remove(this.loopEvent);
         }
     }

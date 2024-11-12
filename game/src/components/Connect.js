@@ -3,7 +3,7 @@ import { useTonConnectUI, useTonWallet, useIsConnectionRestored } from '@tonconn
 import { MainButton } from '@vkruglikov/react-telegram-web-app';
 
 import { useWalletStore } from '../store/wallet';
-import { generatePayload } from '../api/wallet';
+import { generatePayload } from '../sdk/api/wallet';
 import { Payments } from './Payments';
 import { useAppStore } from '../store/app';
 
@@ -62,12 +62,10 @@ export const Connect = () => {
 	}, [ wallet, isConnectionRestored ]);
 
 	const bottomButton = () => {
-		if (loading) {
-			return;
-		}
 		return (
 			<>
 				<MainButton
+					disabled={loading}
 					text="Deposit"
 					onClick={() => togglePayment(true)}
 				/>

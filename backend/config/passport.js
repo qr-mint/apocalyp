@@ -2,8 +2,6 @@ const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 
-const prisma = require("../prisma");
-
 let cache = {};
 passport.cache = cache;
 
@@ -13,20 +11,14 @@ const jwtOptions = {
 };
 
 passport.use(
-  new JwtStrategy(jwtOptions, async (payload, done) => {
+  new JwtStrategy(jwtOptions, (payload, done) => {
     var expirationDate = new Date(payload.exp * 1000);
     if (expirationDate < new Date()) {
       return done(null, false);
     }
-
-    const user = await prisma.users.findFirst({
-      where: { id: payload.id },
-    });
-    if (user) {
-      if (payload.app_key) {
-        user.app_key = payload.app_key;
-      }
-      return done(null, user);
+    if (payload.telegram_id) {
+      console.log(payload);
+      return done(null, { telegram_id: payload.telegram_id, user_id: payload.user_id });
     }
     return done(null, false);
   })

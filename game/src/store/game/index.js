@@ -6,7 +6,7 @@ import { VERSION } from '../config';
 import { 
 	getLevels, getData,
 	updateData, pushLevel,
-	updateCoins, getCoins
+	updateCoins, getCoins,
 } from '../../api/game';
 
 const initialState = {
@@ -20,8 +20,8 @@ export const useGameStore = create()(
 		(set, get) => ({
 			...initialState,
 			init: async () => {
-				const levels = await getLevels();
 				const data = await getData();
+				const levels = await getLevels();
 				set({ data, levels });
 			},
 			pushLevel: async (level) => {

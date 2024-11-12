@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getItems } from "../../api/payments";
+import { getItems } from "../../api/game";
 
 import * as styles from "./style.module.scss";
 import { methodPayments } from "./constants";

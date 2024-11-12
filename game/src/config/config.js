@@ -387,27 +387,3 @@ export const levelData = {
     users: 1000000,
   },
 };
-
-export const badgesRewards = [
-  [{ count: 2, powerUp: "powerUpRing" }],
-  [{ count: 1, powerUp: "universal" }],
-  [
-    { count: 2, powerUp: "addMoreMoves" },
-    { count: 2, powerUp: "powerUpRing" },
-  ],
-  [
-    { count: 1, powerUp: "universal" },
-    { count: 1, powerUp: "addMoreMoves" },
-    { count: 1, powerUp: "powerUpRing" },
-  ],
-  [
-    { count: 1, powerUp: "universal" },
-    { count: 1, powerUp: "powerUpRing" },
-  ],
-  [
-    { count: 2, powerUp: "universal" },
-    { count: 1, powerUp: "addMoreMoves" },
-    { count: 1, powerUp: "powerUpRing" },
-  ],
-];
-

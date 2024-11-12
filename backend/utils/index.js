@@ -7,6 +7,7 @@ exports.generateHex = async (data, botToken) => {
     .map((key) => `${key}=${data[key]}`)
     .sort()
     .join("\n");
+
   const secretKey = await crypto.subtle.importKey(
     "raw",
     encoder.encode("WebAppData"),

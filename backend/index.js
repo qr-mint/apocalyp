@@ -47,8 +47,7 @@ app.use(function (req, res, next) {
 });
 
 app
-  .use("/webhook", require("./router/webhook"))
-  .use("/socket", require("./router/socket"))
+  //.use("/webhook", require("./router/webhook"))
   .use("/images", express.static("public/images"))
   .use("/api", require('./router'))
   .get("/*", async (_, res) => {
